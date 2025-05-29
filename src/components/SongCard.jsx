@@ -4,9 +4,18 @@ import { useDispatch, useSelector } from "react-redux";
 import PlayPause from "./PlayPause";
 import { playPause, setActiveSong } from "../redux/features/playerSlice";
 
-const SongCard = ({ song, i }) => {
-  //const activeSong = "Test";
-  const { activeSong } = useSelector((state) => state.player);
+const SongCard = ({ song, isPlaying, activeSong, i, data }) => {
+  //const { activeSong } = useSelector((state) => state.player);
+  const dispatch = useDispatch();
+
+  const handlePauseClick = () => {
+    dispatch(playPause(false));
+  };
+
+  const handlePlayClick = () => {
+    dispatch(setActiveSong({ song, data, i }));
+    dispatch(playPause(true));
+  };
 
   return (
     <div
@@ -22,13 +31,37 @@ rounded-lg cursor-pointer transform transition-transform duration-300 group-hove
           : "bg-opacity-50"
       } `}
         >
-          <PlayPause />
+          <PlayPause
+            isPlaying={isPlaying}
+            activeSong={activeSong}
+            song={song}
+            handlePause={handlePauseClick}
+            handlePlay={handlePlayClick}
+          />
         </div>
         <img
           alt="song_img"
           src={song.attributes.artwork?.url ?? "/default-image.jpg"}
           className="w-full h-full object-cover rounded-lg"
         />
+      </div>
+      <div className="mt-4 flex flex-col">
+        <p className="text-lg font-semibold truncate text-white">
+          <Link
+            to={`/song/${song.id}`}
+            className="text-white hover:text-gray-300 transition-colors duration-200"
+          >
+            {String(song.attributes.name ?? "Unknown Song")}
+          </Link>
+        </p>
+        <p className="text-sm truncate text-gray-300 mt-1">
+          <Link
+            to={`/artist/${song.attributes.artistName}`}
+            className="text-white hover:text-gray-300 transition-colors duration-200"
+          >
+            {String(song.attributes.artistName)}
+          </Link>
+        </p>
       </div>
     </div>
   );
