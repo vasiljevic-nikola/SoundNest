@@ -1,14 +1,14 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 /* Active Navigation Link */
 .active {
-  @apply text-cyan-500;
+  color: theme("colors.cyan.500");
 }
 
 .active svg {
-  @apply text-cyan-500;
+  color: theme("colors.cyan.500");
 }
 
 .bar:nth-child(2) {
@@ -40,4 +40,69 @@
 .hide-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+/* Stilovi za seekbar */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 5px;
+  height: 5px;
+  outline: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+/* Uklanjanje podrazumevanih stilova */
+input[type="range"]::-webkit-slider-runnable-track {
+  background: transparent;
+  border: none;
+  height: 5px;
+}
+
+input[type="range"]::-moz-range-track {
+  background: transparent;
+  border: none;
+  height: 5px;
+}
+
+/* Animacije za hamburger meni */
+.smooth-transition {
+  transition: all 0.3s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-in-out;
 }

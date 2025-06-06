@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   currentSongs: [],
@@ -6,11 +6,11 @@ const initialState = {
   isActive: false,
   isPlaying: false,
   activeSong: {},
-  genreListId: '',
+  genreListId: "",
 };
 
 const playerSlice = createSlice({
-  name: 'player',
+  name: "player",
   initialState,
   reducers: {
     setActiveSong: (state, action) => {
@@ -57,9 +57,23 @@ const playerSlice = createSlice({
     selectGenreListId: (state, action) => {
       state.genreListId = action.payload;
     },
+
+    // NOVA AKCIJA: Za deaktiviranje pesme i zatvaranje player-a
+    deactivateSong: (state) => {
+      state.isActive = false;
+      state.isPlaying = false;
+      // Ne brisemo activeSong da bi se mogla nastaviti ista pesma ako korisnik ponovo klikne play
+    },
   },
 });
 
-export const { setActiveSong, nextSong, prevSong, playPause, selectGenreListId } = playerSlice.actions;
+export const {
+  setActiveSong,
+  nextSong,
+  prevSong,
+  playPause,
+  selectGenreListId,
+  deactivateSong, // Dodali smo novu akciju u export
+} = playerSlice.actions;
 
 export default playerSlice.reducer;
