@@ -41,7 +41,7 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
-/* Stilovi za seekbar */
+/* Styles for seekbar */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -74,7 +74,7 @@ input[type="range"]::-moz-range-thumb {
   border: none;
 }
 
-/* Uklanjanje podrazumevanih stilova */
+/* Removing default styles */
 input[type="range"]::-webkit-slider-runnable-track {
   background: transparent;
   border: none;
@@ -87,7 +87,7 @@ input[type="range"]::-moz-range-track {
   height: 5px;
 }
 
-/* Animacije za hamburger meni */
+/* Hamburger menu animations */
 .smooth-transition {
   transition: all 0.3s ease-in-out;
 }
