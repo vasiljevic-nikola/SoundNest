@@ -1,5 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const loadFavoritesFromLocalStorage = () => {
+  try {
+    const storedFavorites = localStorage.getItem("favorites");
+    return storedFavorites ? JSON.parse(storedFavorites) : [];
+  } catch (error) {
+    console.error("Failed to load favorites from localStorage:", error);
+    return [];
+  }
+};
+
 const initialState = {
   currentSongs: [],
   currentIndex: 0,
@@ -7,6 +17,7 @@ const initialState = {
   isPlaying: false,
   activeSong: {},
   genreListId: "",
+  favorites: loadFavoritesFromLocalStorage(),
 };
 
 const playerSlice = createSlice({
@@ -15,37 +26,40 @@ const playerSlice = createSlice({
   reducers: {
     setActiveSong: (state, action) => {
       state.activeSong = action.payload.song;
-
-      if (action.payload?.data?.tracks?.hits) {
-        state.currentSongs = action.payload.data.tracks.hits;
-      } else if (action.payload?.data?.properties) {
-        state.currentSongs = action.payload?.data?.tracks;
-      } else {
-        state.currentSongs = action.payload.data;
+      let songsArray = [];
+      if (action.payload.data && Array.isArray(action.payload.data.data)) {
+        songsArray = action.payload.data.data;
+      } else if (Array.isArray(action.payload.data)) {
+        songsArray = action.payload.data;
+      } else if (
+        action.payload.data?.tracks?.hits &&
+        Array.isArray(action.payload.data.tracks.hits)
+      ) {
+        songsArray = action.payload.data.tracks.hits.map((hit) => hit.track);
+      } else if (
+        action.payload.data?.tracks &&
+        Array.isArray(action.payload.data.tracks)
+      ) {
+        songsArray = action.payload.data.tracks;
+      } else if (
+        action.payload.data?.properties?.tracks &&
+        Array.isArray(action.payload.data.properties.tracks)
+      ) {
+        songsArray = action.payload.data.properties.tracks;
       }
-
+      state.currentSongs = songsArray;
       state.currentIndex = action.payload.i;
       state.isActive = true;
     },
 
     nextSong: (state, action) => {
-      if (state.currentSongs[action.payload]?.track) {
-        state.activeSong = state.currentSongs[action.payload]?.track;
-      } else {
-        state.activeSong = state.currentSongs[action.payload];
-      }
-
+      state.activeSong = state.currentSongs[action.payload];
       state.currentIndex = action.payload;
       state.isActive = true;
     },
 
     prevSong: (state, action) => {
-      if (state.currentSongs[action.payload]?.track) {
-        state.activeSong = state.currentSongs[action.payload]?.track;
-      } else {
-        state.activeSong = state.currentSongs[action.payload];
-      }
-
+      state.activeSong = state.currentSongs[action.payload];
       state.currentIndex = action.payload;
       state.isActive = true;
     },
@@ -58,11 +72,26 @@ const playerSlice = createSlice({
       state.genreListId = action.payload;
     },
 
-    // NOVA AKCIJA: Za deaktiviranje pesme i zatvaranje player-a
     deactivateSong: (state) => {
       state.isActive = false;
       state.isPlaying = false;
-      // Ne brisemo activeSong da bi se mogla nastaviti ista pesma ako korisnik ponovo klikne play
+    },
+
+    toggleFavorite: (state, action) => {
+      const songToAdd = action.payload;
+      const isAlreadyFavorite = state.favorites.some(
+        (favSong) => favSong.id === songToAdd.id
+      );
+
+      if (isAlreadyFavorite) {
+        state.favorites = state.favorites.filter(
+          (favSong) => favSong.id !== songToAdd.id
+        );
+      } else {
+        state.favorites.push(songToAdd);
+      }
+
+      localStorage.setItem("favorites", JSON.stringify(state.favorites));
     },
   },
 });
@@ -73,7 +102,8 @@ export const {
   prevSong,
   playPause,
   selectGenreListId,
-  deactivateSong, // Dodali smo novu akciju u export
+  deactivateSong,
+  toggleFavorite,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;
