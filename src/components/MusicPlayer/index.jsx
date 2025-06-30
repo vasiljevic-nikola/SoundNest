@@ -32,11 +32,11 @@ const MusicPlayer = () => {
     isPlaying
   );
 
-  // Funkcija za zatvaranje player-a
+  // Function to close the player
   const handleClosePlayer = () => {
-    console.log("Closing player");
-    dispatch(playPause(false)); // Pauzirajte pesmu
-    dispatch(deactivateSong()); // Deaktivirajte pesmu
+    console.log("Closing player - Button Clicked!");
+    dispatch(playPause(false));
+    dispatch(deactivateSong());
   };
 
   useEffect(() => {
@@ -68,16 +68,14 @@ const MusicPlayer = () => {
   };
 
   const handlePrevSong = () => {
-    // Ako je trenutna pozicija pesme veća od 3 sekunde, vrati na početak
+    // If the current position of the song is more than 3 seconds, go back to the beginning
     if (appTime > 3) {
       setSeekTime(0);
       return;
     }
 
-    // Prvo pauzirajte trenutnu pesmu
     dispatch(playPause(false));
 
-    // Zatim prebacite na prethodnu pesmu
     if (currentIndex === 0) {
       if (currentSongs?.length) {
         dispatch(prevSong(currentSongs.length - 1));
@@ -90,7 +88,7 @@ const MusicPlayer = () => {
       dispatch(prevSong(currentIndex - 1));
     }
 
-    // Dodajte malo odlaganje pre puštanja nove pesme
+    // A little delay before playing a new song
     setTimeout(() => {
       dispatch(playPause(true));
     }, 100);
@@ -98,7 +96,7 @@ const MusicPlayer = () => {
 
   return (
     <div className="relative sm:px-12 px-8 w-full flex items-center justify-between">
-      {/* Dugme X u gornjem desnom uglu */}
+      {/* X button */}
       <button
         onClick={handleClosePlayer}
         className="absolute top-2 right-2 text-white hover:text-gray-300"
