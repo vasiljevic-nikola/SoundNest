@@ -12,16 +12,17 @@ const Player = ({
 }) => {
   const ref = useRef(null);
 
-  console.log("Player rendering with:", {
-    activeSong,
-    isPlaying,
-    audioSrc:
-      activeSong?.attributes?.previews?.[0]?.url ||
-      activeSong?.hub?.actions?.[1]?.uri ||
-      "",
-  });
+  // Access the audio URL in multiple ways
+  const audioSrc =
+    activeSong?.attributes?.previews?.[0]?.url ||
+    activeSong?.hub?.actions?.[1]?.uri ||
+    "";
+
+  console.log("Player - activeSong:", JSON.stringify(activeSong, null, 2));
+  console.log("Player - audioSrc:", audioSrc);
 
   useEffect(() => {
+    console.log("Player useEffect [isPlaying] - isPlaying:", isPlaying);
     if (ref.current) {
       if (isPlaying) {
         console.log("Attempting to play audio");
@@ -48,12 +49,6 @@ const Player = ({
       ref.current.currentTime = seekTime;
     }
   }, [seekTime]);
-
-  // Pristup audio URL-u na više načina
-  const audioSrc =
-    activeSong?.attributes?.previews?.[0]?.url ||
-    activeSong?.hub?.actions?.[1]?.uri ||
-    "";
 
   return (
     <audio
