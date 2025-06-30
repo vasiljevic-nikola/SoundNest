@@ -1,20 +1,27 @@
 import React from "react";
 
+// Function to get image URL with {w} and {h} replaced
+const getImageUrl = (song, size = 400) => {
+  const imageUrl = song?.attributes?.artwork?.url;
+  if (imageUrl) {
+    return imageUrl.replace("{w}", size).replace("{h}", size);
+  }
+  return "/default-image.png";
+};
+
 const Track = ({ isPlaying, isActive, activeSong }) => {
   console.log("Track component rendering with activeSong:", activeSong);
 
-  // Pristup slici na više načina
-  const coverArt =
-    activeSong?.attributes?.artwork?.url ||
-    activeSong?.images?.coverart ||
-    activeSong?.album?.images?.[0]?.url ||
-    "/default-image.jpg";
+  // Image access
+  const coverArt = activeSong?.attributes?.artwork?.url
+    ? getImageUrl(activeSong, 400)
+    : "/default-image.png"; // Fallback to default image
 
-  // Pristup nazivu pesme na više načina
+  // Access song title
   const songTitle =
     activeSong?.attributes?.name || activeSong?.title || "No active Song";
 
-  // Pristup imenu izvođača na više načina
+  // Artist name access
   const artistName =
     activeSong?.attributes?.artistName ||
     activeSong?.subtitle ||
