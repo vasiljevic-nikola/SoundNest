@@ -1,12 +1,17 @@
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
 import PlayPause from "./PlayPause";
-import { playPause, setActiveSong } from "../redux/features/playerSlice";
+import {
+  playPause,
+  setActiveSong,
+  toggleFavorite,
+} from "../redux/features/playerSlice";
 
 const SongCard = ({ song, isPlaying, activeSong, i, data }) => {
-  //const { activeSong } = useSelector((state) => state.player);
   const dispatch = useDispatch();
+  const { favorites } = useSelector((state) => state.player);
 
   const handlePauseClick = () => {
     dispatch(playPause(false));
@@ -14,8 +19,22 @@ const SongCard = ({ song, isPlaying, activeSong, i, data }) => {
 
   const handlePlayClick = () => {
     dispatch(setActiveSong({ song, data, i }));
-    console.log("Setting active song:", song);
+    console.log("Setting active song:", JSON.stringify(song, null, 2));
     dispatch(playPause(true));
+  };
+
+  const handleToggleFavorite = () => {
+    dispatch(toggleFavorite(song));
+  };
+
+  const isFavorite = favorites.some((favSong) => favSong.id === song.id);
+
+  const getImageUrl = (song, size = 400) => {
+    const imageUrl = song.attributes?.artwork?.url;
+    if (imageUrl) {
+      return imageUrl.replace("{w}", size).replace("{h}", size);
+    }
+    return "/default-image.png";
   };
 
   return (
@@ -27,11 +46,23 @@ rounded-lg cursor-pointer transform transition-transform duration-300 group-hove
         <div
           className={`absolute inset-0 justify-center items-center bg-opacity-300 transition-opacity duration-300
       ${
-        activeSong?.title === song.title
+        activeSong?.id === song.id
           ? " shadow-lg group-hover:bg-black/30"
           : "bg-opacity-50"
       } `}
         >
+          {/* Heart button */}
+          <div
+            className="absolute top-3 right-3 z-10"
+            onClick={handleToggleFavorite}
+          >
+            {isFavorite ? (
+              <AiFillHeart className="text-red-500 text-2xl cursor-pointer" />
+            ) : (
+              <AiOutlineHeart className="text-white text-2xl cursor-pointer" />
+            )}
+          </div>
+
           <PlayPause
             isPlaying={isPlaying}
             activeSong={activeSong}
@@ -42,26 +73,36 @@ rounded-lg cursor-pointer transform transition-transform duration-300 group-hove
         </div>
         <img
           alt="song_img"
-          src={song.attributes.artwork?.url ?? "/default-image.jpg"}
+          src={getImageUrl(song, 400)}
           className="w-full h-full object-cover rounded-lg"
+          referrerPolicy="no-referrer"
+          onError={(e) => {
+            e.currentTarget.src = "/default-image.png";
+          }}
         />
       </div>
       <div className="mt-4 flex flex-col">
         <p className="text-lg font-semibold truncate text-white">
           <Link
-            to={`/song/${song.id}`}
+            to={`/songs/${song.id}`}
             className="text-white hover:text-gray-300 transition-colors duration-200"
           >
             {String(song.attributes.name ?? "Unknown Song")}
           </Link>
         </p>
         <p className="text-sm truncate text-gray-300 mt-1">
-          <Link
-            to={`/artist/${song.attributes.artistName}`}
-            className="text-white hover:text-gray-300 transition-colors duration-200"
-          >
-            {String(song.attributes.artistName)}
-          </Link>
+          {song?.relationships?.artists?.data?.[0]?.id ? (
+            <Link
+              to={`/artists/${song?.relationships?.artists?.data?.[0]?.id}`}
+              className="text-white hover:text-gray-300 transition-colors duration-200"
+            >
+              {song?.attributes?.artistName}
+            </Link>
+          ) : (
+            <p className="text-base text-gray-300 mt-1 line-clamp-1">
+              {song?.attributes?.artistName}
+            </p>
+          )}
         </p>
       </div>
     </div>
