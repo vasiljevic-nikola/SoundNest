@@ -17,19 +17,42 @@ const Discover = () => {
     (state) => state.player
   );
 
-  const { data, isFetching, error } = useGetSongsByGenreQuery(
-    genreListId || "POP",
-    {
-      skip: !genreListId && !genres[0]?.value,
-    }
-  );
+  // Koristimo useGetTopChartsQuery za početnu stranicu (kada nema odabranog žanra)
+  const {
+    data: topChartsData,
+    isFetching: isTopChartsFetching,
+    error: topChartsError,
+  } = useGetTopChartsQuery(30, {
+    skip: !!genreListId, // Preskačemo ako je odabran žanr
+  });
+
+  // Koristimo useGetSongsByGenreQuery kada je odabran specifičan žanr
+  const {
+    data: genreData,
+    isFetching: isGenreFetching,
+    error: genreError,
+  } = useGetSongsByGenreQuery(genreListId, {
+    skip: !genreListId, // Preskačemo ako nije odabran žanr
+  });
+
+  // Određujemo koji podaci se koriste
+  const data = genreListId ? genreData : topChartsData;
+  const isFetching = genreListId ? isGenreFetching : isTopChartsFetching;
+  const error = genreListId ? genreError : topChartsError;
 
   console.log("data:", data);
   console.log("isFetching:", isFetching);
   console.log("error:", error);
+  console.log("genreListId:", genreListId);
 
-  const genreTitle =
-    genres.find(({ value }) => value === genreListId)?.title || "Pop";
+  // Određujemo naslov stranice
+  const getPageTitle = () => {
+    if (!genreListId) {
+      return "Discover"; // Početna stranica bez žanra
+    }
+    const genreTitle = genres.find(({ value }) => value === genreListId)?.title;
+    return `Discover ${genreTitle}`;
+  };
 
   if (isFetching) return <Loader title="Loading Songs..." />;
   if (error) return <Error />;
@@ -41,14 +64,23 @@ const Discover = () => {
       <div className="flex-1 flex flex-col">
         <div className="w-full flex justify-between items-center sm:flex-row flex-col mt-4 mb-10">
           <h2 className="font-bold text-3xl text-white text-left">
-            Discover {genreTitle}
+            {getPageTitle()}
           </h2>
 
           <select
-            onChange={(e) => dispatch(selectGenreListId(e.target.value))}
-            value={genreListId || "POP"}
+            onChange={(e) => {
+              const selectedValue = e.target.value;
+              // Ako je odabrana "All" opcija, resetujemo genreListId
+              if (selectedValue === "") {
+                dispatch(selectGenreListId(""));
+              } else {
+                dispatch(selectGenreListId(selectedValue));
+              }
+            }}
+            value={genreListId || ""}
             className="bg-black text-gray-300 p-3 text-sm rounded-lg outline-none sm:mt-0 mt-5"
           >
+            <option value="">All Genres</option>
             {genres.map((genre) => (
               <option key={genre.value} value={genre.value}>
                 {genre.title}
@@ -60,7 +92,7 @@ const Discover = () => {
         <div className="flex flex-wrap sm:justify-start justify-center gap-8">
           {hasResults ? (
             data
-              .slice(0, 50)
+              .slice(0, 30)
               .map((song, i) => (
                 <SongCard
                   key={song.id || i}
@@ -73,16 +105,28 @@ const Discover = () => {
               ))
           ) : (
             <div className="w-full text-center text-white text-xl mt-10">
-              <p>No songs found for "{genreTitle}" genre.</p>
+              <p>
+                {genreListId
+                  ? `No songs found for "${
+                      genres.find(({ value }) => value === genreListId)?.title
+                    }" genre.`
+                  : "No songs found."}
+              </p>
               <p className="mt-2">
-                Please try another genre or go back to{" "}
-                <span
-                  className="text-blue-400 cursor-pointer"
-                  onClick={() => dispatch(selectGenreListId("POP"))}
-                >
-                  Pop Charts
-                </span>
-                .
+                {genreListId ? (
+                  <>
+                    Please try another genre or go back to{" "}
+                    <span
+                      className="text-blue-400 cursor-pointer"
+                      onClick={() => dispatch(selectGenreListId(""))}
+                    >
+                      All Genres
+                    </span>
+                    .
+                  </>
+                ) : (
+                  "Please try refreshing the page."
+                )}
               </p>
             </div>
           )}

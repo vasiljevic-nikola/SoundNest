@@ -16,7 +16,7 @@ const initialState = {
   isActive: false,
   isPlaying: false,
   activeSong: {},
-  genreListId: "",
+  genreListId: "", // Početna vrednost je prazan string za "All Genres"
   favorites: loadFavoritesFromLocalStorage(),
 };
 
@@ -72,6 +72,11 @@ const playerSlice = createSlice({
       state.genreListId = action.payload;
     },
 
+    // Nova akcija za resetovanje na početnu stranicu (All Genres)
+    resetToAllGenres: (state) => {
+      state.genreListId = "";
+    },
+
     deactivateSong: (state) => {
       state.isActive = false;
       state.isPlaying = false;
@@ -102,6 +107,7 @@ export const {
   prevSong,
   playPause,
   selectGenreListId,
+  resetToAllGenres,
   deactivateSong,
   toggleFavorite,
 } = playerSlice.actions;

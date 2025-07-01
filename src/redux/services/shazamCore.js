@@ -15,14 +15,14 @@ export const shazamCoreApi = createApi({
   }),
   endpoints: (builder) => ({
     getTopCharts: builder.query({
-      query: (limit = 10) => `/charts/get-top-songs-in-world?limit=${limit}`,
+      query: (limit = 30) => `/charts/get-top-songs-in-world?limit=${limit}`,
       transformResponse: (response) => {
         return response?.data || [];
       },
     }),
     getSongsByGenre: builder.query({
       query: (genre) =>
-        `/charts/get-top-songs-in_world_by_genre?genre=${genre}&limit=10`,
+        `/charts/get-top-songs-in_world_by_genre?genre=${genre}&limit=30`,
       transformResponse: (response) => {
         console.log("shazamCore.js - Raw Genre API Response:", response);
         return response?.data || [];
