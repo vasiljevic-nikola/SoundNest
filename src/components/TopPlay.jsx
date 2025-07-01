@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode } from "swiper";
+
+// Redux slice hooks
 import { useGetTopChartsQuery } from "../redux/services/shazamCore";
 import { setActiveSong, playPause } from "../redux/features/playerSlice";
 import PlayPause from "./PlayPause";
@@ -11,6 +13,7 @@ import { Loader, Error } from "./";
 import "swiper/css";
 import "swiper/css/free-mode";
 
+// Helper to format image URLs (especially with {w} and {h} placeholders)
 const getImageUrl = (song, size = 400) => {
   const imageUrl = song.attributes?.artwork?.url;
   if (imageUrl) {
@@ -19,6 +22,7 @@ const getImageUrl = (song, size = 400) => {
   return "/default-image.png";
 };
 
+// Card representing a single top chart entry
 const TopChartCard = ({
   song,
   i,
@@ -29,8 +33,11 @@ const TopChartCard = ({
 }) => {
   return (
     <div className="w-full flex flex-row items-center hover:bg-[#4c426e] py-2 p-4 rounded-lg cursor-pointer mb-2">
+      {/* Song ranking number */}
       <h3 className="font-bold text-base text-white mr-3">{i + 1}.</h3>
+      {/* Cover art + title and artist */}
       <div className="flex-1 flex flex-row justify-between items-center">
+        {/* Album image + play overlay */}
         <div className="relative w-20 h-20">
           <img
             className="w-full h-full rounded-lg object-cover"
@@ -79,6 +86,7 @@ const TopChartCard = ({
   );
 };
 
+// Main component rendering top charts and top artists carousel
 const TopPlay = () => {
   const dispatch = useDispatch();
   const { activeSong, isPlaying } = useSelector((state) => state.player);
@@ -95,7 +103,6 @@ const TopPlay = () => {
     if (divRef.current) {
       divRef.current.scrollIntoView({ behavior: "smooth" });
     }
-    console.log("Komponenta renderovana, scrollIntoView");
   }, []);
 
   const topPlays = data && data.slice ? data.slice(0, 5) : [];
@@ -161,6 +168,7 @@ const TopPlay = () => {
           </Link>
         </div>
 
+        {/* Swiper carousel for top artist images */}
         <Swiper
           slidesPerView="auto"
           spaceBetween={15}

@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 
+// Player component handles raw audio playback logic
 const Player = ({
   activeSong,
   isPlaying,
@@ -21,6 +22,7 @@ const Player = ({
   console.log("Player - activeSong:", JSON.stringify(activeSong, null, 2));
   console.log("Player - audioSrc:", audioSrc);
 
+  // Toggle playback state when isPlaying changes
   useEffect(() => {
     console.log("Player useEffect [isPlaying] - isPlaying:", isPlaying);
     if (ref.current) {
@@ -38,18 +40,21 @@ const Player = ({
     }
   }, [isPlaying]);
 
+  // Update volume dynamically whenever prop changes
   useEffect(() => {
     if (ref.current) {
       ref.current.volume = volume;
     }
   }, [volume]);
 
+  // Update playback position (seek) when seekTime changes
   useEffect(() => {
     if (ref.current) {
       ref.current.currentTime = seekTime;
     }
   }, [seekTime]);
 
+  // Render HTML5 audio element controlled via ref
   return (
     <audio
       src={audioSrc}

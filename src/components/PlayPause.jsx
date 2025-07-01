@@ -8,6 +8,7 @@ const PlayPause = ({
   handlePlay,
 }) => (
   <div className="relative group flex justify-center items-center w-full h-full">
+    {/* Icon container */}
     <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-300">
       {isPlaying && activeSong?.title === song.title ? (
         <FaPauseCircle

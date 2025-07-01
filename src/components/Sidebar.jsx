@@ -19,6 +19,7 @@ const links = [
   { name: "Favorites", to: "/favorites", icon: HiOutlineHeart },
 ];
 
+// Reusable component to render navigation links
 const NavLinks = ({ handleClick }) => (
   <div className="mt-10">
     {links.map((item) => (
@@ -35,6 +36,7 @@ const NavLinks = ({ handleClick }) => (
   </div>
 );
 
+// Sidebar component handles both desktop and responsive mobile navigation UI
 const Sidebar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 

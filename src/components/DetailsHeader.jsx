@@ -1,11 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+// Header component that displays artist or song details depending on the context
 const DetailsHeader = ({ artistId, artistData, songData }) => {
   const isArtist = artistId;
 
-  // Data to display
-  // For the artist, the data is inside artistData.attributes
+  // Extract display data depending on whether we're showing artist or song info
   const name = isArtist
     ? artistData?.attributes?.name
     : songData?.attributes?.name || songData?.title;
@@ -16,11 +16,12 @@ const DetailsHeader = ({ artistId, artistData, songData }) => {
   const releaseDate = isArtist ? null : songData?.attributes?.releaseDate;
 
   // Image
-  // For the artist, the image is artistData.attributes.artwork.url
+  // Get artwork URL (artist or song), with fallback logic
   const artworkUrl = isArtist
     ? artistData?.attributes?.artwork?.url
     : songData?.attributes?.artwork?.url || songData?.images?.coverart;
 
+  // Formats artwork URLs by replacing {w} and {h} placeholders
   const getImageUrl = (url, size = 400) => {
     if (url) {
       // The Shazam API for artist artwork has a {w}x{h} placeholder
@@ -34,8 +35,10 @@ const DetailsHeader = ({ artistId, artistData, songData }) => {
 
   return (
     <div className="relative w-full flex flex-col">
+      {/* Background gradient bar */}
       <div className="w-full bg-gradient-to-tl from-transparent to-black sm:h-48 h-28" />
 
+      {/* Main content area: profile image and metadata */}
       <div className="absolute inset-0 flex items-center">
         <img
           alt="profile"
@@ -48,8 +51,10 @@ const DetailsHeader = ({ artistId, artistData, songData }) => {
         />
 
         <div className="ml-5">
+          {/* Main title */}
           <p className="font-bold sm:text-3xl text-xl text-white">{name}</p>
 
+          {/* Artist link shown only if we are on a song page */}
           {!isArtist && (
             <Link
               to={`/artists/${songData?.relationships?.artists?.data?.[0]?.id}`}
@@ -58,6 +63,7 @@ const DetailsHeader = ({ artistId, artistData, songData }) => {
             </Link>
           )}
 
+          {/* Genre or release year info */}
           <p className="text-base text-gray-400 mt-2">
             {isArtist
               ? artistData?.attributes?.genreNames?.[0] || "Artist"
@@ -68,6 +74,7 @@ const DetailsHeader = ({ artistId, artistData, songData }) => {
         </div>
       </div>
 
+      {/* Spacer for layout balance */}
       <div className="w-full sm:h-44 h-24" />
     </div>
   );

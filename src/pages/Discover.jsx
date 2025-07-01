@@ -9,6 +9,7 @@ import { selectGenreListId } from "../redux/features/playerSlice";
 import { genres } from "../assets/constants";
 import { TopPlay } from "../components";
 
+// Discover component displays top charts or songs by selected genre
 const Discover = () => {
   console.log("Discover render");
 
@@ -17,25 +18,25 @@ const Discover = () => {
     (state) => state.player
   );
 
-  // Koristimo useGetTopChartsQuery za početnu stranicu (kada nema odabranog žanra)
+  // Fetch default top charts if no genre is selected
   const {
     data: topChartsData,
     isFetching: isTopChartsFetching,
     error: topChartsError,
   } = useGetTopChartsQuery(30, {
-    skip: !!genreListId, // Preskačemo ako je odabran žanr
+    skip: !!genreListId,
   });
 
-  // Koristimo useGetSongsByGenreQuery kada je odabran specifičan žanr
+  // Fetch songs by selected genre
   const {
     data: genreData,
     isFetching: isGenreFetching,
     error: genreError,
   } = useGetSongsByGenreQuery(genreListId, {
-    skip: !genreListId, // Preskačemo ako nije odabran žanr
+    skip: !genreListId,
   });
 
-  // Određujemo koji podaci se koriste
+  // Determine which data set to display
   const data = genreListId ? genreData : topChartsData;
   const isFetching = genreListId ? isGenreFetching : isTopChartsFetching;
   const error = genreListId ? genreError : topChartsError;
@@ -45,10 +46,10 @@ const Discover = () => {
   console.log("error:", error);
   console.log("genreListId:", genreListId);
 
-  // Određujemo naslov stranice
+  // Resolve dynamic page title based on selected genre
   const getPageTitle = () => {
     if (!genreListId) {
-      return "Discover"; // Početna stranica bez žanra
+      return "Discover";
     }
     const genreTitle = genres.find(({ value }) => value === genreListId)?.title;
     return `Discover ${genreTitle}`;
@@ -62,6 +63,7 @@ const Discover = () => {
   return (
     <div className="flex flex-col xl:flex-row">
       <div className="flex-1 flex flex-col">
+        {/* Header with title and genre selector */}
         <div className="w-full flex justify-between items-center sm:flex-row flex-col mt-4 mb-10">
           <h2 className="font-bold text-3xl text-white text-left">
             {getPageTitle()}
@@ -70,7 +72,7 @@ const Discover = () => {
           <select
             onChange={(e) => {
               const selectedValue = e.target.value;
-              // Ako je odabrana "All" opcija, resetujemo genreListId
+
               if (selectedValue === "") {
                 dispatch(selectGenreListId(""));
               } else {
@@ -89,6 +91,7 @@ const Discover = () => {
           </select>
         </div>
 
+        {/* List of songs or fallback message */}
         <div className="flex flex-wrap sm:justify-start justify-center gap-8">
           {hasResults ? (
             data

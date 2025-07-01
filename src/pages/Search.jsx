@@ -5,11 +5,13 @@ import { useSelector } from "react-redux";
 import { Error, Loader, SongCard } from "../components";
 import { useGetSongsBySearchQuery } from "../redux/services/shazamCore";
 
+// Search component shows results based on URL parameter (searchTerm)
 const Search = () => {
-  const { searchTerm } = useParams();
+  const { searchTerm } = useParams(); // Extract search term from the route
 
   console.log("Search.jsx - searchTerm:", searchTerm);
 
+  // If no search term provided, prompt user
   if (!searchTerm || searchTerm.trim() === "") {
     return (
       <div className="p-4 text-white">
@@ -22,6 +24,7 @@ const Search = () => {
 
   const { activeSong, isPlaying } = useSelector((state) => state.player);
 
+  // Fetch songs matching the searchTerm
   const { data, isFetching, error } = useGetSongsBySearchQuery(searchTerm, {
     skip: !searchTerm || searchTerm.trim() === "",
   });
@@ -40,6 +43,7 @@ const Search = () => {
 
   return (
     <div className="flex flex-col p-4">
+      {/* Header showing search context */}
       <h2 className="font-bold text-3xl text-white mb-10">
         Showing results for <span className="font-black">{searchTerm}</span>
       </h2>

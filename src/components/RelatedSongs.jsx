@@ -12,9 +12,11 @@ const RelatedSongs = ({
 
   return (
     <div className="flex flex-col">
+      {/* Header for the related songs section */}
       <h1 className="font-bold text-3xl text-white">Related Songs:</h1>
 
       <div className="mt-6 w-full flex flex-col">
+        {/* Map through each related song and render a SongCard */}
         {data?.map((song, i) => (
           <SongCard
             key={song.id}

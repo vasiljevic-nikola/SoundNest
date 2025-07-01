@@ -9,6 +9,7 @@ const getImageUrl = (song, size = 400) => {
   return "/default-image.png";
 };
 
+// Track component displays song metadata and cover art
 const Track = ({ isPlaying, isActive, activeSong }) => {
   console.log("Track component rendering with activeSong:", activeSong);
 
@@ -29,6 +30,7 @@ const Track = ({ isPlaying, isActive, activeSong }) => {
 
   return (
     <div className="flex-1 flex items-center justify-start">
+      {/* Animated spinning artwork if song is active and playing */}
       <div
         className={`${
           isPlaying && isActive ? "animate-[spin_3s_linear_infinite]" : ""
@@ -36,6 +38,7 @@ const Track = ({ isPlaying, isActive, activeSong }) => {
       >
         <img src={coverArt} alt="cover art" className="rounded-full" />
       </div>
+      {/* Display song title and artist */}
       <div className="w-[50%]">
         <p className="truncate text-white font-bold text-lg">{songTitle}</p>
         <p className="truncate text-gray-300">{artistName}</p>

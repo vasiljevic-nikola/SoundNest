@@ -1,5 +1,6 @@
 import React from "react";
 
+// Seekbar component allows users to track and control audio playback position
 const Seekbar = ({ value, min, max, onInput, setSeekTime, appTime }) => {
   // Converts the time to format 0:00
   const getTime = (time) =>
@@ -9,6 +10,7 @@ const Seekbar = ({ value, min, max, onInput, setSeekTime, appTime }) => {
 
   return (
     <div className="sm:flex flex-row items-center">
+      {/* Skip backward 5 seconds */}
       <button
         type="button"
         onClick={() => setSeekTime(appTime - 5)}
@@ -16,7 +18,9 @@ const Seekbar = ({ value, min, max, onInput, setSeekTime, appTime }) => {
       >
         -
       </button>
+      {/* Current time display */}
       <p className="text-white">{value === 0 ? "0:00" : getTime(value)}</p>
+      {/* Main input range for seeking through the track */}
       <input
         type="range"
         step="any"
@@ -38,7 +42,9 @@ const Seekbar = ({ value, min, max, onInput, setSeekTime, appTime }) => {
         }}
         className="md:block w-24 md:w-56 2xl:w-96 h-1 mx-4 2xl:mx-6 rounded-lg"
       />
+      {/* Total duration display */}
       <p className="text-white">{max === 0 ? "0:00" : getTime(max)}</p>
+      {/* Skip forward 5 seconds */}
       <button
         type="button"
         onClick={() => setSeekTime(appTime + 5)}

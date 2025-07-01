@@ -17,8 +17,10 @@ const SongBar = ({
       activeSong?.title === song?.title ? "bg-[#4c426e]" : "bg-transparent"
     } py-2 p-4 rounded-lg cursor-pointer mb-2`}
   >
+    {/* Song index in list */}
     <h3 className="font-bold text-base text-white mr-3">{i + 1}.</h3>
     <div className="flex-1 flex flex-row justify-between items-center">
+      {/* Song or artist cover image */}
       <img
         className="w-20 h-20 rounded-lg"
         src={
@@ -30,6 +32,8 @@ const SongBar = ({
         }
         alt={song?.title}
       />
+
+      {/* Song title and artist/album name */}
       <div className="flex-1 flex flex-col justify-center mx-3">
         {!artistId ? (
           <Link to={`/songs/${song.key}`}>
@@ -40,11 +44,15 @@ const SongBar = ({
             {song?.attributes?.name}
           </p>
         )}
+
+        {/* Album name (for artist context) or song subtitle */}
         <p className="text-base text-gray-300 mt-1">
           {artistId ? song?.attributes?.albumName : song?.subtitle}
         </p>
       </div>
     </div>
+
+    {/* Show PlayPause button only if not in artist context */}
     {!artistId ? (
       <PlayPause
         isPlaying={isPlaying}

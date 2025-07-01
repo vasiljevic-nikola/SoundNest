@@ -14,9 +14,11 @@ import Seekbar from "./Seekbar";
 import Track from "./Track";
 import VolumeBar from "./VolumeBar";
 
+// Main music player component
 const MusicPlayer = () => {
   const { activeSong, currentSongs, currentIndex, isActive, isPlaying } =
     useSelector((state) => state.player);
+  // Local state for duration, seek position, current time, volume, repeat/shuffle modes
   const [duration, setDuration] = useState(0);
   const [seekTime, setSeekTime] = useState(0);
   const [appTime, setAppTime] = useState(0);
@@ -38,11 +40,12 @@ const MusicPlayer = () => {
     dispatch(playPause(false));
     dispatch(deactivateSong());
   };
-
+  // Updates the duration when the current song changes
   useEffect(() => {
     if (currentSongs.length) setDuration(currentSongs[currentIndex]?.duration);
   }, [currentSongs, currentIndex]);
 
+  // Play/pause toggle handler
   const handlePlayPause = () => {
     if (!isActive) return;
 
@@ -53,6 +56,7 @@ const MusicPlayer = () => {
     }
   };
 
+  // Advances to the next track (shuffled or sequential)
   const handleNextSong = () => {
     dispatch(playPause(false));
 
@@ -62,11 +66,13 @@ const MusicPlayer = () => {
       dispatch(nextSong(Math.floor(Math.random() * currentSongs.length)));
     }
 
+    // Add a short delay before resuming playback
     setTimeout(() => {
       dispatch(playPause(true));
     }, 100);
   };
 
+  // Goes back to the previous track or restarts the current one
   const handlePrevSong = () => {
     // If the current position of the song is more than 3 seconds, go back to the beginning
     if (appTime > 3) {
@@ -76,6 +82,7 @@ const MusicPlayer = () => {
 
     dispatch(playPause(false));
 
+    // Handle edge cases: start of playlist or shuffle mode
     if (currentIndex === 0) {
       if (currentSongs?.length) {
         dispatch(prevSong(currentSongs.length - 1));
@@ -104,11 +111,13 @@ const MusicPlayer = () => {
         <AiOutlineClose size={20} />
       </button>
 
+      {/* Song thumbnail and info */}
       <Track
         isPlaying={isPlaying}
         isActive={isActive}
         activeSong={activeSong}
       />
+      {/* Central playback controls and seekbar */}
       <div className="flex-1 flex flex-col items-center justify-center">
         <Controls
           isPlaying={isPlaying}
@@ -142,6 +151,8 @@ const MusicPlayer = () => {
           onLoadedData={(event) => setDuration(event.target.duration)}
         />
       </div>
+
+      {/* Volume control slider */}
       <VolumeBar
         value={volume}
         min="0"

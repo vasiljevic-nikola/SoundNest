@@ -14,11 +14,14 @@ const ArtistDetails = () => {
   const { id: artistId } = useParams();
   const { activeSong, isPlaying } = useSelector((state) => state.player);
 
+  // Fetch artist profile info
   const {
     data: artistData,
     isFetching: isFetchingArtistDetails,
     error: errorArtistDetails,
   } = useGetArtistDetailsQuery(artistId);
+
+  // Fetch top songs of the artist
   const {
     data: artistTopSongs,
     isFetching: isFetchingArtistTopSongs,
@@ -37,6 +40,7 @@ const ArtistDetails = () => {
     isFetchingArtistTopSongs
   );
 
+  // Handle API loading and error states
   if (isFetchingArtistDetails || isFetchingArtistTopSongs)
     return <Loader title="Loading artist details..." />;
   if (errorArtistDetails || errorArtistTopSongs)
@@ -61,6 +65,7 @@ const ArtistDetails = () => {
         songData={null}
       />
 
+      {/* Section with list of top songs */}
       <div className="mb-10">
         <h2 className="text-white text-3xl font-bold">
           Top Songs by {artistData.attributes?.name || artistData.name}:

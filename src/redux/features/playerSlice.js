@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// Load favorites from localStorage on app start
 const loadFavoritesFromLocalStorage = () => {
   try {
     const storedFavorites = localStorage.getItem("favorites");
@@ -24,9 +25,12 @@ const playerSlice = createSlice({
   name: "player",
   initialState,
   reducers: {
+    // Activates selected song and resolves song list from various structures
     setActiveSong: (state, action) => {
       state.activeSong = action.payload.song;
       let songsArray = [];
+
+      // Resolve song list depending on API response shape
       if (action.payload.data && Array.isArray(action.payload.data.data)) {
         songsArray = action.payload.data.data;
       } else if (Array.isArray(action.payload.data)) {
@@ -52,12 +56,14 @@ const playerSlice = createSlice({
       state.isActive = true;
     },
 
+    // Moves to the next song
     nextSong: (state, action) => {
       state.activeSong = state.currentSongs[action.payload];
       state.currentIndex = action.payload;
       state.isActive = true;
     },
 
+    // Moves to the previous song
     prevSong: (state, action) => {
       state.activeSong = state.currentSongs[action.payload];
       state.currentIndex = action.payload;
@@ -68,15 +74,17 @@ const playerSlice = createSlice({
       state.isPlaying = action.payload;
     },
 
+    // Set selected genre filter
     selectGenreListId: (state, action) => {
       state.genreListId = action.payload;
     },
 
-    // Nova akcija za resetovanje na početnu stranicu (All Genres)
+    // Reset genre filter to "All Genres"
     resetToAllGenres: (state) => {
       state.genreListId = "";
     },
 
+    // Deactivate current song and stop playback
     deactivateSong: (state) => {
       state.isActive = false;
       state.isPlaying = false;

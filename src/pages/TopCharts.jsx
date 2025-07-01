@@ -5,10 +5,13 @@ import { Error, Loader, SongCard } from "../components";
 import { useGetTopChartsQuery } from "../redux/services/shazamCore";
 
 const TopChartsPage = () => {
+  // Fetch top 50 songs via RTK Query
   const { data, isFetching, error } = useGetTopChartsQuery(50);
 
+  // Access current playback state from Redux store
   const { activeSong, isPlaying } = useSelector((state) => state.player);
 
+  // Show loading spinner or error component if needed
   if (isFetching) return <Loader title="Loading Top Charts..." />;
   if (error) return <Error title="Failed to load Top Charts." />;
 

@@ -13,6 +13,8 @@ export const shazamCoreApi = createApi({
       return headers;
     },
   }),
+
+  // Gets a list of top global songs
   endpoints: (builder) => ({
     getTopCharts: builder.query({
       query: (limit = 30) => `/charts/get-top-songs-in-world?limit=${limit}`,
@@ -20,6 +22,8 @@ export const shazamCoreApi = createApi({
         return response?.data || [];
       },
     }),
+
+    // Gets songs by genre name
     getSongsByGenre: builder.query({
       query: (genre) =>
         `/charts/get-top-songs-in_world_by_genre?genre=${genre}&limit=30`,
@@ -28,6 +32,8 @@ export const shazamCoreApi = createApi({
         return response?.data || [];
       },
     }),
+
+    // Searches for songs
     getSongsBySearch: builder.query({
       query: (searchTerm) => {
         const url = searchTerm
@@ -36,8 +42,10 @@ export const shazamCoreApi = createApi({
         console.log("shazamCore.js - Search URL:", url);
         return url;
       },
+
       transformResponse: (response) => {
         console.log("shazamCore.js - Raw Search API Response:", response);
+        // Normalizes structure of songs from search API
         const rawHits = response?.data?.tracks?.hits || [];
         const transformedSongs = rawHits.map((hit) => {
           const song = hit;
@@ -76,7 +84,6 @@ export const shazamCoreApi = createApi({
             const artist = song.attributes?.artistName;
             const artistId = song.relationships.artists.data[0].id;
             if (!artists[artistId]) {
-              // Proveravamo po ID-u
               artists[artistId] = {
                 id: artistId,
                 name: artist,
@@ -89,6 +96,7 @@ export const shazamCoreApi = createApi({
         return Object.values(artists);
       },
     }),
+    // Fetch detailed song info by song ID
     getSongDetails: builder.query({
       query: (songid) => `/songs/get_details?id=${songid}`,
       transformResponse: (response) => {

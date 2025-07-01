@@ -17,18 +17,22 @@ const SongCard = ({ song, isPlaying, activeSong, i, data }) => {
     dispatch(playPause(false));
   };
 
+  // Set song as active and start playback
   const handlePlayClick = () => {
     dispatch(setActiveSong({ song, data, i }));
     console.log("Setting active song:", JSON.stringify(song, null, 2));
     dispatch(playPause(true));
   };
 
+  // Toggle song in/out of favorites list
   const handleToggleFavorite = () => {
     dispatch(toggleFavorite(song));
   };
 
+  // Check if current song is marked as favorite
   const isFavorite = favorites.some((favSong) => favSong.id === song.id);
 
+  // Resolve artwork URL with fallback and dynamic sizing
   const getImageUrl = (song, size = 400) => {
     const imageUrl = song.attributes?.artwork?.url;
     if (imageUrl) {
@@ -42,6 +46,7 @@ const SongCard = ({ song, isPlaying, activeSong, i, data }) => {
       className="relative group flex flex-col w-[250px] p-4 bg-white/5 bg-opacity-80 backdrop-blur-sm animate-slideup
 rounded-lg cursor-pointer transform transition-transform duration-300 group-hover:scale-105"
     >
+      {/* Cover and overlay with play/pause and heart */}
       <div className="relative w-full h-56">
         <div
           className={`absolute inset-0 justify-center items-center bg-opacity-300 transition-opacity duration-300
@@ -71,6 +76,8 @@ rounded-lg cursor-pointer transform transition-transform duration-300 group-hove
             handlePlay={handlePlayClick}
           />
         </div>
+
+        {/* Cover image */}
         <img
           alt="song_img"
           src={getImageUrl(song, 400)}
@@ -81,6 +88,8 @@ rounded-lg cursor-pointer transform transition-transform duration-300 group-hove
           }}
         />
       </div>
+
+      {/* Song name and artist */}
       <div className="mt-4 flex flex-col">
         <p className="text-lg font-semibold truncate text-white">
           <Link

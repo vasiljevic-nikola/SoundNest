@@ -6,6 +6,7 @@ const SearchBar = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Handles form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     const trimmedTerm = searchTerm.trim();
@@ -22,11 +23,15 @@ const SearchBar = () => {
       autoComplete="off"
       className="p-2 text-gray-400 focus-within:text-gray-600"
     >
+      {/* Hidden label for accessibility */}
       <label htmlFor="search-field" className="sr-only">
         Search all songs
       </label>
       <div className="flex flex-row justify-start items-center">
+        {/* Search icon */}
         <FiSearch className="w-5 h-5 ml-4" />
+
+        {/* Input field for search term */}
         <input
           id="search-field"
           placeholder="Search..."
