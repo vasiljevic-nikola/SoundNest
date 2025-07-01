@@ -41,6 +41,7 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
 /* Styles for seekbar */
 input[type="range"] {
   -webkit-appearance: none;
@@ -105,4 +106,63 @@ input[type="range"]::-moz-range-track {
 
 .slide-in {
   animation: slideIn 0.3s ease-in-out;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  /* Ensure mobile sidebar doesn't interfere with content */
+  .mobile-sidebar-open {
+    overflow: hidden;
+  }
+
+  /* Better mobile navigation spacing */
+  .mobile-nav-link {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .mobile-nav-link:last-child {
+    border-bottom: none;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small devices adjustments */
+  .mobile-sidebar {
+    width: 85% !important;
+  }
+
+  .hamburger-icon {
+    width: 28px !important;
+    height: 28px !important;
+  }
+}
+
+/* Logo hover effect for desktop */
+@media (min-width: 768px) {
+  .logo-container:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
+  }
+}
+
+/* Improved focus states for accessibility */
+.nav-link:focus,
+.hamburger-button:focus {
+  outline: 2px solid theme("colors.cyan.400");
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+.nav-link,
+.hamburger-button {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Better mobile touch targets */
+@media (max-width: 768px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
