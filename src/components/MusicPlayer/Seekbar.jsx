@@ -9,7 +9,7 @@ const Seekbar = ({ value, min, max, onInput, setSeekTime, appTime }) => {
   console.log("Rendering SeekBar with values:", { value, min, max, appTime });
 
   return (
-    <div className="sm:flex flex-row items-center">
+    <div className="flex flex-row items-center w-full justify-between">
       {/* Skip backward 5 seconds */}
       <button
         type="button"
@@ -19,7 +19,9 @@ const Seekbar = ({ value, min, max, onInput, setSeekTime, appTime }) => {
         -
       </button>
       {/* Current time display */}
-      <p className="text-white">{value === 0 ? "0:00" : getTime(value)}</p>
+      <p className="text-white text-sm sm:text-base">
+        {value === 0 ? "0:00" : getTime(value)}
+      </p>
       {/* Main input range for seeking through the track */}
       <input
         type="range"
@@ -31,7 +33,6 @@ const Seekbar = ({ value, min, max, onInput, setSeekTime, appTime }) => {
         style={{
           WebkitAppearance: "none",
           appearance: "none",
-          background: "rgba(255, 255, 255, 0.1)",
           borderRadius: "5px",
           height: "5px",
           outline: "none",
@@ -40,10 +41,12 @@ const Seekbar = ({ value, min, max, onInput, setSeekTime, appTime }) => {
           border: "none",
           boxShadow: "none",
         }}
-        className="md:block w-24 md:w-56 2xl:w-96 h-1 mx-4 2xl:mx-6 rounded-lg"
+        className="flex-grow h-1 mx-4 2xl:mx-6 rounded-lg"
       />
       {/* Total duration display */}
-      <p className="text-white">{max === 0 ? "0:00" : getTime(max)}</p>
+      <p className="text-white text-sm sm:text-base">
+        {max === 0 ? "0:00" : getTime(max)}
+      </p>
       {/* Skip forward 5 seconds */}
       <button
         type="button"

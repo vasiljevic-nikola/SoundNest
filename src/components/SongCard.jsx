@@ -13,32 +13,46 @@ const SongCard = ({ song, isPlaying, activeSong, i, data }) => {
   const dispatch = useDispatch();
   const { favorites } = useSelector((state) => state.player);
 
+  // --- Event Handlers ---
   const handlePauseClick = () => {
     dispatch(playPause(false));
   };
 
-  // Set song as active and start playback
   const handlePlayClick = () => {
     dispatch(setActiveSong({ song, data, i }));
-    console.log("Setting active song:", JSON.stringify(song, null, 2));
     dispatch(playPause(true));
   };
 
-  // Toggle song in/out of favorites list
   const handleToggleFavorite = () => {
     dispatch(toggleFavorite(song));
   };
 
-  // Check if current song is marked as favorite
-  const isFavorite = favorites.some((favSong) => favSong.id === song.id);
+  // --- Data Normalization & Helpers ---
+  // These variables ensure the component can correctly display data
+  // regardless of the song object's structure (from charts vs. search).
+  const songTitle = song.attributes?.name || song.title || "Unknown Song";
+  const artistName =
+    song.attributes?.artistName || song.subtitle || "Unknown Artist";
+  const artistId =
+    song.relationships?.artists?.data?.[0]?.id || song.artists?.[0]?.adamid;
+  const songId = song.id || song.key;
 
-  // Resolve artwork URL with fallback and dynamic sizing
+  // Check if the current song is in the favorites list.
+  const isFavorite = favorites.some(
+    (favSong) => (favSong.id || favSong.key) === songId
+  );
+
+  // Helper function to get the correct image URL and handle fallbacks.
   const getImageUrl = (song, size = 400) => {
-    const imageUrl = song.attributes?.artwork?.url;
+    const imageUrl =
+      song.attributes?.artwork?.url ||
+      song.images?.default ||
+      song.images?.coverart;
     if (imageUrl) {
+      // Replace placeholders for desired image size.
       return imageUrl.replace("{w}", size).replace("{h}", size);
     }
-    return "/default-image.png";
+    return "/default-image.png"; // Fallback image
   };
 
   return (
@@ -46,17 +60,18 @@ const SongCard = ({ song, isPlaying, activeSong, i, data }) => {
       className="relative group flex flex-col w-[250px] p-4 bg-white/5 bg-opacity-80 backdrop-blur-sm animate-slideup
 rounded-lg cursor-pointer transform transition-transform duration-300 group-hover:scale-105"
     >
-      {/* Cover and overlay with play/pause and heart */}
+      {/* --- Artwork and Overlay --- */}
       <div className="relative w-full h-56">
         <div
           className={`absolute inset-0 justify-center items-center bg-opacity-300 transition-opacity duration-300
       ${
-        activeSong?.id === song.id
+        // Show overlay if the song is the currently active one.
+        (activeSong?.id || activeSong?.key) === songId
           ? " shadow-lg group-hover:bg-black/30"
           : "bg-opacity-50"
       } `}
         >
-          {/* Heart button */}
+          {/* Favorite (Heart) Button */}
           <div
             className="absolute top-3 right-3 z-10"
             onClick={handleToggleFavorite}
@@ -68,6 +83,7 @@ rounded-lg cursor-pointer transform transition-transform duration-300 group-hove
             )}
           </div>
 
+          {/* Play/Pause Button Overlay */}
           <PlayPause
             isPlaying={isPlaying}
             activeSong={activeSong}
@@ -77,7 +93,7 @@ rounded-lg cursor-pointer transform transition-transform duration-300 group-hove
           />
         </div>
 
-        {/* Cover image */}
+        {/* Song Cover Image */}
         <img
           alt="song_img"
           src={getImageUrl(song, 400)}
@@ -89,28 +105,23 @@ rounded-lg cursor-pointer transform transition-transform duration-300 group-hove
         />
       </div>
 
-      {/* Song name and artist */}
+      {/* --- Song and Artist Info --- */}
       <div className="mt-4 flex flex-col">
-        <p className="text-lg font-semibold truncate text-white">
-          <Link
-            to={`/songs/${song.id}`}
-            className="text-white hover:text-gray-300 transition-colors duration-200"
-          >
-            {String(song.attributes.name ?? "Unknown Song")}
-          </Link>
-        </p>
+        {/* Song Title (No longer a link) */}
+        <p className="text-lg font-semibold truncate text-white">{songTitle}</p>
+        {/* Artist Name (Links to artist details page) */}
         <p className="text-sm truncate text-gray-300 mt-1">
-          {song?.relationships?.artists?.data?.[0]?.id ? (
+          {artistId ? (
             <Link
-              to={`/artists/${song?.relationships?.artists?.data?.[0]?.id}`}
+              to={`/artists/${artistId}`}
               className="text-white hover:text-gray-300 transition-colors duration-200"
             >
-              {song?.attributes?.artistName}
+              {artistName}
             </Link>
           ) : (
-            <p className="text-base text-gray-300 mt-1 line-clamp-1">
-              {song?.attributes?.artistName}
-            </p>
+            <span className="text-base text-gray-300 mt-1 line-clamp-1">
+              {artistName}
+            </span>
           )}
         </p>
       </div>

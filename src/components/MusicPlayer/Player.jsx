@@ -1,6 +1,5 @@
 import React, { useRef, useEffect } from "react";
 
-// Player component handles raw audio playback logic
 const Player = ({
   activeSong,
   isPlaying,
@@ -13,48 +12,48 @@ const Player = ({
 }) => {
   const ref = useRef(null);
 
-  // Access the audio URL in multiple ways
   const audioSrc =
     activeSong?.attributes?.previews?.[0]?.url ||
-    activeSong?.hub?.actions?.[1]?.uri ||
+    activeSong?.stores?.apple?.previewurl ||
     "";
 
-  console.log("Player - activeSong:", JSON.stringify(activeSong, null, 2));
-  console.log("Player - audioSrc:", audioSrc);
-
-  // Toggle playback state when isPlaying changes
+  // --- Play/Pause Effect ---
+  // This effect is triggered whenever the `isPlaying` state or `audioSrc` changes.
   useEffect(() => {
-    console.log("Player useEffect [isPlaying] - isPlaying:", isPlaying);
     if (ref.current) {
-      if (isPlaying) {
-        console.log("Attempting to play audio");
+      if (isPlaying && audioSrc) {
+        // If should be playing and a valid source exists, play the audio.
         ref.current.play().catch((err) => {
+          // Ignore AbortError which can happen on fast re-renders.
           if (err.name !== "AbortError") {
             console.error("Error playing audio:", err);
           }
         });
       } else {
-        console.log("Pausing audio");
+        // Otherwise, pause the audio.
         ref.current.pause();
       }
     }
-  }, [isPlaying]);
+  }, [isPlaying, audioSrc]);
 
-  // Update volume dynamically whenever prop changes
+  // --- Volume Control Effect ---
+  // Updates the audio element's volume whenever the volume prop changes.
   useEffect(() => {
     if (ref.current) {
       ref.current.volume = volume;
     }
   }, [volume]);
 
-  // Update playback position (seek) when seekTime changes
+  // --- Seek/Time Update Effect ---
+  // Updates the audio element's current playback time when the user seeks.
   useEffect(() => {
     if (ref.current) {
       ref.current.currentTime = seekTime;
     }
   }, [seekTime]);
 
-  // Render HTML5 audio element controlled via ref
+  // --- Render Audio Element ---
+  // The actual HTML5 audio tag that plays the music. It's controlled via the `ref`.
   return (
     <audio
       src={audioSrc}

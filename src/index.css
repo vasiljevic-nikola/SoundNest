@@ -166,3 +166,56 @@ input[type="range"]::-moz-range-track {
     min-width: 44px;
   }
 }
+/* Global CSS for styling input type="range" */
+
+/* Thumb styling - white circle */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: white;
+  border: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -5px;
+  box-shadow: 0px 0px 0px 3px rgba(255, 255, 255, 0.3);
+  z-index: 2;
+  position: relative;
+}
+
+input[type="range"]::-moz-range-thumb {
+  background: white;
+  border: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0px 0px 0px 3px rgba(255, 255, 255, 0.3);
+  z-index: 2;
+  position: relative;
+}
+
+/* Track styling for Webkit browsers */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+}
+
+/* Styling the bar (track) for Firefox */
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+}
+
+input[type="range"]::-webkit-slider-runnable-track::before {
+  content: none;
+}
+
+input[type="range"]::-moz-range-progress {
+  background: transparent;
+}

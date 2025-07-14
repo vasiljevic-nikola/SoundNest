@@ -10,12 +10,12 @@ import {
 // Functional component that renders playback controls
 const Controls = ({
   isPlaying,
-  isActive,
+  isActive, // isActive prop is not used in this component, consider removing if not needed
   repeat,
   setRepeat,
   shuffle,
   setShuffle,
-  currentSongs,
+  currentSongs, // currentSongs prop is not used in this component, consider removing if not needed
   handlePlayPause,
   handlePrevSong,
   handleNextSong,
@@ -23,7 +23,7 @@ const Controls = ({
   console.log("Controls rendering with currentSongs:", currentSongs);
 
   return (
-    <div className="flex items-center justify-around md:w-36 lg:w-52 2xl:w-80">
+    <div className="flex flex-row items-center justify-around gap-4 w-full">
       {/* Repeat button: turns red when active */}
       <BsArrowRepeat
         size={20}

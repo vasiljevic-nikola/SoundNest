@@ -4,16 +4,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode } from "swiper";
 
-// Redux slice hooks
 import { useGetTopChartsQuery } from "../redux/services/shazamCore";
 import { setActiveSong, playPause } from "../redux/features/playerSlice";
 import PlayPause from "./PlayPause";
-import { Loader, Error } from "./";
 
+// Import Swiper styles
 import "swiper/css";
 import "swiper/css/free-mode";
 
-// Helper to format image URLs (especially with {w} and {h} placeholders)
+// --- Helper Functions ---
 const getImageUrl = (song, size = 400) => {
   const imageUrl = song.attributes?.artwork?.url;
   if (imageUrl) {
@@ -22,7 +21,6 @@ const getImageUrl = (song, size = 400) => {
   return "/default-image.png";
 };
 
-// Card representing a single top chart entry
 const TopChartCard = ({
   song,
   i,
@@ -30,81 +28,62 @@ const TopChartCard = ({
   activeSong,
   handlePauseClick,
   handlePlayClick,
-}) => {
-  return (
-    <div className="w-full flex flex-row items-center hover:bg-[#4c426e] py-2 p-4 rounded-lg cursor-pointer mb-2">
-      {/* Song ranking number */}
-      <h3 className="font-bold text-base text-white mr-3">{i + 1}.</h3>
-      {/* Cover art + title and artist */}
-      <div className="flex-1 flex flex-row justify-between items-center">
-        {/* Album image + play overlay */}
-        <div className="relative w-20 h-20">
-          <img
-            className="w-full h-full rounded-lg object-cover"
-            src={getImageUrl(song, 400)}
-            alt={song?.attributes?.name}
-            referrerPolicy="no-referrer"
-            onError={(e) => {
-              e.currentTarget.src = "/default-image.png";
-            }}
+}) => (
+  <div className="w-full flex flex-row items-center hover:bg-[#4c426e] py-2 p-4 rounded-lg cursor-pointer mb-2">
+    <h3 className="font-bold text-base text-white mr-3">{i + 1}.</h3>
+    <div className="flex-1 flex flex-row justify-between items-center">
+      <div className="relative w-20 h-20">
+        <img
+          className="w-full h-full rounded-lg object-cover"
+          src={getImageUrl(song, 400)}
+          alt={song?.attributes?.name}
+          referrerPolicy="no-referrer"
+          onError={(e) => {
+            e.currentTarget.src = "/default-image.png";
+          }}
+        />
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 hover:bg-opacity-40 rounded-lg transition">
+          <PlayPause
+            isPlaying={isPlaying}
+            activeSong={activeSong}
+            song={song}
+            handlePause={handlePauseClick}
+            handlePlay={() => handlePlayClick(song, i)}
           />
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 hover:bg-opacity-40 rounded-lg transition">
-            <PlayPause
-              isPlaying={isPlaying}
-              activeSong={activeSong}
-              song={song}
-              handlePause={handlePauseClick}
-              handlePlay={() => handlePlayClick(song, i)}
-            />
-          </div>
-        </div>
-
-        {/* Title and artist */}
-        <div className="flex-1 flex flex-col justify-center mx-3">
-          <Link to={`/songs/${song?.id}`}>
-            <p className="text-xl font-bold text-white line-clamp-1">
-              {song?.attributes?.name}
-            </p>
-          </Link>
-
-          {song?.relationships?.artists?.data?.[0]?.id ? (
-            <Link
-              to={`/artists/${song?.relationships?.artists?.data?.[0]?.id}`}
-            >
-              <p className="text-base text-gray-300 mt-1 line-clamp-1">
-                {song?.attributes?.artistName}
-              </p>
-            </Link>
-          ) : (
-            <p className="text-base text-gray-300 mt-1 line-clamp-1">
-              {song?.attributes?.artistName}
-            </p>
-          )}
         </div>
       </div>
+      <div className="flex-1 flex flex-col justify-center mx-3">
+        {/* Song Title (No longer a link) */}
+        <p className="text-xl font-bold text-white line-clamp-1">
+          {song?.attributes?.name}
+        </p>
+        {/* Artist Name (Links to artist details page) */}
+        <Link to={`/artists/${song?.relationships?.artists?.data?.[0]?.id}`}>
+          <p className="text-base text-gray-300 mt-1 line-clamp-1">
+            {song?.attributes?.artistName}
+          </p>
+        </Link>
+      </div>
     </div>
-  );
-};
+  </div>
+);
 
-// Main component rendering top charts and top artists carousel
 const TopPlay = () => {
+  // --- Redux & State Hooks ---
   const dispatch = useDispatch();
   const { activeSong, isPlaying } = useSelector((state) => state.player);
-
-  console.log("Pokretanje useGetTopChartsQuery() hook...");
   const { data, isFetching, error } = useGetTopChartsQuery(10);
-  console.log("data:", data);
-  console.log("isFetching:", isFetching);
-  console.log("error:", error);
-
   const divRef = useRef(null);
 
+  // --- Effects ---
+  // Scrolls the component into view on initial render.
   useEffect(() => {
     if (divRef.current) {
       divRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, []);
 
+  // --- Data & Event Handlers ---
   const topPlays = data && data.slice ? data.slice(0, 5) : [];
 
   const handlePauseClick = () => {
@@ -116,26 +95,16 @@ const TopPlay = () => {
     dispatch(playPause(true));
   };
 
-  if (isFetching) {
-    console.log("Loading...");
-    return <Loader title="Loading Top Charts..." />;
-  }
-  if (error) {
-    console.log("Greška pri dohvatu podataka:", error);
-    return <Error />;
-  }
-
-  if (!data || data.length === 0) {
-    console.log("Nema podataka ili data je prazno");
-    return <Loader title="No Top Charts available." />;
-  }
+  // --- Render Logic ---
+  // Don't render anything while fetching or if an error occurs.
+  if (isFetching || error) return null;
 
   return (
     <div
       ref={divRef}
-      className="xl:ml-6 ml-0 xl:mb-0 mb-6 flex-1 xl:max-w-[500px] max-w-full flex flex-col"
+      className="xl:ml-6 ml-0 xl:mb-0 mb-6 flex-1 xl:max-w-[500px] max-w-full flex flex-col pr-6"
     >
-      {/* TOP CHARTS */}
+      {/* --- TOP CHARTS Section --- */}
       <div className="w-full flex flex-col">
         <div className="flex flex-row justify-between items-center">
           <h2 className="text-white font-bold text-2xl">Top Charts</h2>
@@ -143,8 +112,8 @@ const TopPlay = () => {
             <p className="text-gray-300 text-base cursor-pointer">See more</p>
           </Link>
         </div>
-
-        <div className="mt-4 flex flex-col gap-1 max-h-[300px] overflow-y-scroll pr-2 hide-scrollbar">
+        {/* This container has a max height and will scroll if content overflows. */}
+        <div className="mt-4 flex flex-col gap-1 max-h-[40vh] overflow-y-auto hide-scrollbar">
           {topPlays?.map((song, i) => (
             <TopChartCard
               key={song?.id || i}
@@ -159,7 +128,7 @@ const TopPlay = () => {
         </div>
       </div>
 
-      {/* TOP ARTISTS */}
+      {/* --- TOP ARTISTS Section --- */}
       <div className="w-full flex flex-col mt-8">
         <div className="flex flex-row justify-between items-center">
           <h2 className="text-white font-bold text-2xl">Top Artists</h2>
@@ -167,8 +136,7 @@ const TopPlay = () => {
             <p className="text-gray-300 text-base cursor-pointer">See more</p>
           </Link>
         </div>
-
-        {/* Swiper carousel for top artist images */}
+        {/* Swiper component for the artist carousel */}
         <Swiper
           slidesPerView="auto"
           spaceBetween={15}
@@ -193,7 +161,7 @@ const TopPlay = () => {
                   className="rounded-full w-full object-cover"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
-                    e.currentTarget.src = "/default-artist.png";
+                    e.currentTarget.src = "/default-image.png";
                   }}
                 />
               </Link>

@@ -1,9 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+// Create an API slice using Redux Toolkit Query
 export const shazamCoreApi = createApi({
   reducerPath: "shazamCoreApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://shazam-core7.p.rapidapi.com",
+    // Prepare headers to include the API key before each request
     prepareHeaders: (headers) => {
       headers.set(
         "x-rapidapi-key",
@@ -14,81 +16,60 @@ export const shazamCoreApi = createApi({
     },
   }),
 
-  // Gets a list of top global songs
+  // Define the API endpoints
   endpoints: (builder) => ({
+    // Endpoint to get top charts
     getTopCharts: builder.query({
       query: (limit = 30) => `/charts/get-top-songs-in-world?limit=${limit}`,
-      transformResponse: (response) => {
-        return response?.data || [];
-      },
+      // Transform the response to ensure we always return an array
+      transformResponse: (response) => response?.data || [],
     }),
 
-    // Gets songs by genre name
+    // Endpoint to get songs by a specific genre
     getSongsByGenre: builder.query({
       query: (genre) =>
         `/charts/get-top-songs-in_world_by_genre?genre=${genre}&limit=30`,
-      transformResponse: (response) => {
-        console.log("shazamCore.js - Raw Genre API Response:", response);
-        return response?.data || [];
-      },
+      transformResponse: (response) => response?.data || [],
     }),
 
-    // Searches for songs
+    // Endpoint to search for songs
     getSongsBySearch: builder.query({
-      query: (searchTerm) => {
-        const url = searchTerm
-          ? `/search?term=${encodeURIComponent(searchTerm)}&limit=10`
-          : null;
-        console.log("shazamCore.js - Search URL:", url);
-        return url;
-      },
-
+      query: (searchTerm) =>
+        `/search?term=${encodeURIComponent(searchTerm)}&limit=10`,
+      // Transform the search results into a consistent song object structure
       transformResponse: (response) => {
-        console.log("shazamCore.js - Raw Search API Response:", response);
-        // Normalizes structure of songs from search API
         const rawHits = response?.data?.tracks?.hits || [];
-        const transformedSongs = rawHits.map((hit) => {
+        return rawHits.map((hit) => {
           const song = hit;
           return {
             id: song.key,
-            type: song.type,
-            attributes: {
-              name: song.heading?.title || song.alias,
-              artistName: song.heading?.subtitle,
-              artwork: {
-                url: song.images?.default || song.images?.play,
-              },
-              previews: song.stores?.apple?.previewurl
-                ? [{ url: song.stores.apple.previewurl }]
-                : [],
-            },
-            share: song.share,
+            key: song.key,
+            title: song.heading?.title || song.alias,
+            subtitle: song.heading?.subtitle,
+            images: song.images,
+            artists: song.artists,
             stores: song.stores,
-            url: song.url,
           };
         });
-        console.log(
-          "shazamCore.js - Transformed Search Songs:",
-          transformedSongs
-        );
-        return transformedSongs;
       },
     }),
+
+    // Endpoint to get a list of top artists (derived from top charts)
     getTopArtistsFromCharts: builder.query({
       query: (limit = 50) => `/charts/get-top-songs-in-world?limit=${limit}`,
+      // Transform the list of songs into a unique list of artists
       transformResponse: (response) => {
         const songs = response?.data || [];
         const artists = {};
         songs.forEach((song) => {
           if (song.relationships?.artists?.data?.length > 0) {
-            const artist = song.attributes?.artistName;
             const artistId = song.relationships.artists.data[0].id;
+            const artistName = song.attributes?.artistName;
             if (!artists[artistId]) {
               artists[artistId] = {
                 id: artistId,
-                name: artist,
+                name: artistName,
                 artwork: song.attributes?.artwork?.url,
-                url: song.relationships.artists.data[0].href,
               };
             }
           }
@@ -96,46 +77,27 @@ export const shazamCoreApi = createApi({
         return Object.values(artists);
       },
     }),
-    // Fetch detailed song info by song ID
-    getSongDetails: builder.query({
-      query: (songid) => `/songs/get_details?id=${songid}`,
-      transformResponse: (response) => {
-        console.log("shazamCore.js - Raw Song Details API Response:", response);
-        return response || null;
-      },
-    }),
+
+    // Endpoint to get details for a specific artist
     getArtistDetails: builder.query({
       query: (artistId) => `/artist/get-details?id=${artistId}`,
-      transformResponse: (response) => {
-        console.log(
-          "shazamCore.js - Raw Artist Details API Response:",
-          response
-        );
-        return response?.data?.[0] || null;
-      },
+      transformResponse: (response) => response?.data?.[0] || null,
     }),
 
+    // Endpoint to get the top songs for a specific artist
     getArtistTopSongs: builder.query({
       query: (artistId) => `/artist/get-top-songs?id=${artistId}&offset=0`,
-      transformResponse: (response) => {
-        console.log(
-          "shazamCore.js - Raw Artist Top Songs API Response:",
-          response
-        );
-        const rawSongs = response?.data || [];
-
-        return rawSongs;
-      },
+      transformResponse: (response) => response?.data || [],
     }),
   }),
 });
 
+// Export the auto-generated hooks for each endpoint
 export const {
   useGetTopChartsQuery,
   useGetSongsBySearchQuery,
   useGetSongsByGenreQuery,
   useGetTopArtistsFromChartsQuery,
-  useGetSongDetailsQuery,
   useGetArtistDetailsQuery,
   useGetArtistTopSongsQuery,
 } = shazamCoreApi;
